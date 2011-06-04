@@ -1,3 +1,7 @@
+//
+// Given a process, toggle the sink device for all audio streams associated with
+// that process.
+//
 #include <stdio.h>
 #include <string.h>
 #include <pulse/pulseaudio.h>
