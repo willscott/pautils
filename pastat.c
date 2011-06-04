@@ -239,8 +239,6 @@ int pa_stat(int samples, char *sink, short quiet) {
   return 0;
 }
 
-// This program takes a sink, and estimates the magnitude of the
-// stream to that sink, in dB.
 int main(int argc, char **argv) {
   int n = -1;
   char *sink = NULL;
@@ -259,7 +257,7 @@ int main(int argc, char **argv) {
         break;
       case '?':
       default:
-        fprintf (stderr, "Usage: %s [-n <Number of samples>] [-s <Sink>].\n",
+        fprintf (stderr, "Usage: %s [-q] [-n <Number of samples>] [-s <Sink>].\n",
             argv[0]);
         return 1;
     }
