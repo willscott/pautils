@@ -88,18 +88,17 @@ void pa_source_cb(pa_context *c, const pa_source_info *i, int last,
 void pa_read_cb(pa_stream *s, size_t len, void *userdata) {
   struct monitored_stream* watch = userdata;
   const void *data;
-  size_t samples;
+  size_t slen;
   size_t pos;
   short max = watch->amp;
   short sample = 0;
-
   if (pa_stream_peek(s, &data, &len) < 0) {
     fprintf(stderr, "Reading stream failed.\n");
     return;
   }
 
-  samples = len / sizeof(short);
-  for (pos = 0; pos < samples ; pos+=1) {
+  slen = len / sizeof(short);
+  for (pos = 0; pos < slen; pos+=1) {
     sample = ((short*)data)[pos];
     if (sample > max) {
       max = sample;
@@ -133,7 +132,7 @@ int pa_stat(int samples, char *sink, short quiet) {
   streams.head = NULL;
   streams.spec = &ss;
   struct monitored_stream* a_stream = streams.head;
-  time_t now;
+  time_t now = time(NULL);
 
   // Initiate Connection
   pa_ml = pa_mainloop_new();
@@ -201,14 +200,14 @@ int pa_stat(int samples, char *sink, short quiet) {
             fprintf(stdout,"[%u] %s\n", idx++, a_stream->source_name);
             a_stream = a_stream->next;
           }
-          fprintf(stdout,"\n");
+          fprintf(stdout, "\n");
           idx = 0;
           a_stream = streams.head;
           while(a_stream != NULL) {
             fprintf(stdout,"[%u]\t", idx++);
             a_stream = a_stream->next;
           }
-          fprintf(stdout,"\n");
+          fprintf(stdout, "\n");
         }
         state++;
         break;
@@ -223,7 +222,7 @@ int pa_stat(int samples, char *sink, short quiet) {
             a_stream->amp = -1;
             a_stream = a_stream->next;
           }
-          fprintf(stdout,"\n");
+          fprintf(stdout, "\n");
         }
         if (samples == 0) {
           pa_ready = 3;
@@ -262,6 +261,6 @@ int main(int argc, char **argv) {
         return 1;
     }
   }
-
-  return pa_stat(n, sink, q);
+  n = pa_stat(n, sink, q);
+  return n;
 }
