@@ -1,12 +1,16 @@
-PA Utils
+Pulse Audio Utilities
 ========
 
-Pulseaudio is the audio subsystem used in ubuntu, and seems
-to be gaining some level of traction within the linux world.
+Pulseaudio is a modern linux audio subsystem.  It is backed
+by Ubuntu, and offers an intermediate abstraction between
+audio devices and their legacy drivers, and a wide range
+of applications.
 
-Sadly, the level of control available of the system from
-the command line is relatively limited.
+There are capable GUI interfaces to Pulseaudio, allowing application
+streams to be manipulated with a high degree of precision.  However,
+the scripting capabiliites and command line tools are not yet fully
+developed.
 
 This repository provides some higher level functionality
-for maintaining control of your audio on a per-app basis
+for taking control of your audio on a per-app basis
 from the command line.
