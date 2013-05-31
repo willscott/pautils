@@ -12,8 +12,8 @@ void pa_source_cb(pa_context *c, const pa_source_info *i, int last,
     void *userdata);
 void pa_read_cb(pa_stream *s, size_t len, void *userdata);
 void pa_state_cb(pa_context *c, void *userdata);
-void pretty_print(short amp);
-int pa_stat(int samples, char *sink, short quiet);
+void pretty_print(short amp, short percflag);
+int pa_stat(int samples, char *sink, short quiet, short showper);
 
 struct monitored_stream {
   pa_stream *stream;
@@ -32,13 +32,21 @@ struct stream_stats {
 };
 
 /// Function Implementations
-void pretty_print(short s) {
+void pretty_print(short s, short showPerc) {
   float val = SHRT_MAX;
   if (s < 0) {
     fprintf(stdout,"-\t");
   } else {
     val = s * 100.0 / val;
-    fprintf(stdout,"%2.2f%%\t",val);
+    if (showPerc > 0) {
+      fprintf(stdout,"%2.2f%%\t",val);
+    } else {
+      if (val < 10) {
+        fprintf(stdout,"%1.0f\t",val);
+      } else {
+        fprintf(stdout,"%2.0f\t",val);
+      }
+    }
   }
 }
 
@@ -111,7 +119,7 @@ void pa_read_cb(pa_stream *s, size_t len, void *userdata) {
   pa_stream_drop(s);
 }
 
-int pa_stat(int samples, char *sink, short quiet) {
+int pa_stat(int samples, char *sink, short quiet, short showPerc) {
   // Connection variables
   pa_mainloop *pa_ml;
   pa_mainloop_api *pa_mlapi;
@@ -218,7 +226,7 @@ int pa_stat(int samples, char *sink, short quiet) {
           samples--;
           a_stream = streams.head;
           while(a_stream != NULL) {
-            pretty_print(a_stream->amp);
+            pretty_print(a_stream->amp, showPerc);
             a_stream->amp = -1;
             a_stream = a_stream->next;
           }
@@ -243,8 +251,12 @@ int main(int argc, char **argv) {
   char *sink = NULL;
   int c;
   short q = 0;
-  while ((c = getopt (argc, argv, "n:s:q")) != -1) {
+  short showp = 1;
+  while ((c = getopt (argc, argv, "n:s:pq")) != -1) {
     switch (c) {
+      case 'p':
+        showp = 0;
+        break;
       case 'n':
         n = atoi(optarg);
         break;
@@ -256,11 +268,11 @@ int main(int argc, char **argv) {
         break;
       case '?':
       default:
-        fprintf (stderr, "Usage: %s [-q] [-n <Number of samples>] [-s <Sink>].\n",
+        fprintf (stderr, "Usage: %s [-p] [-q] [-n <Number of samples>] [-s <Sink>].\n",
             argv[0]);
         return 1;
     }
   }
-  n = pa_stat(n, sink, q);
+  n = pa_stat(n, sink, q, showp);
   return n;
 }
